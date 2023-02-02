@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./plantilla/plantilla.xhtml">
+
+            <ui:define name="top">
+                <h:form id="form4">
+                    <p:tabMenu activeIndex="4">
+
+                        <p:menuitem value="Index" outcome="index">
+
+                        </p:menuitem>
+                        <p:menuitem value="Categorias" outcome="listadoCategorias">
+
+                        </p:menuitem>
+
+                        <p:menuitem value="Equipos" outcome="listadoEquipos">
+
+                        </p:menuitem>
+
+                        <p:menuitem value="Sanciones" outcome="listadoSancion">
+
+                        </p:menuitem>
+
+                        <p:menuitem value="Sanciones Impuestas" outcome="listadoIngresoSanciones">
+
+                        </p:menuitem>
+                    </p:tabMenu>
+                </h:form>
+            </ui:define>
+
+            <ui:define name="content">
+                <h:body>
+
+                    <p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+                        <f:facet name="start">
+                            <h:graphicImage library="images" name="ajaxloading.gif" />
+                        </f:facet>
+                        <f:facet name="complete">
+                            <h:outputText value="" />
+                        </f:facet>
+                    </p:ajaxStatus>
+
+                    <h:form prependId="false" id="form">
+
+                        <p:growl id="messages" showDetail="true" />
+                        <p:messages />
+
+                        <p:dataTable 
+                            id="ingresosanciones" 
+                            var="ingresosancion" 
+                            value="#{ingresosancionBean.ingresoSancion}" 
+                            editable="true" 
+                            rowKey="#{ingresosancion.idingresosancion}"
+                            selection="#{ingresosancionBean.ingresoSancionSeleccionada}" 
+                            selectionMode="single">
+
+                            <f:facet name="header">  
+                                Lista de Sanciones Impuestas 
+                            </f:facet>
+
+
+                            <p:column headerText="Equipo">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{ingresosancion.equipo}" />
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{ingresosancion.equipo}" />
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Numero Jugador">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{ingresosancion.numeroJugador}" />
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{ingresosancion.numeroJugador}" />
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column headerText="Sancion">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{ingresosancion.sancion}" />
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{ingresosancion.sancion}" />
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <f:facet name="footer">
+                                <p:commandButton value="Regresar" action="index" />
+                                <p:spacer height="5px;"/>
+                                <p:commandButton value="Agregar" actionListener="#{ingresosancionBean.reiniciarIngresoSancionSeleccionada}" oncomplete="PF('ingresosancionDialogo').show();" update="ingresosanciones">
+                                    <p:ajax event="dialogReturn" update="ingresosanciones"/>
+                                </p:commandButton>
+                            </f:facet>
+
+                            <p:column headerText="Opciones" style="width:50px">
+                                <p:rowEditor />
+                            </p:column>
+
+                            <p:ajax event="rowEdit" listener="#{ingresosancionBean.editListener}">
+                            </p:ajax>
+                        </p:dataTable>
+
+
+
+                        <p:contextMenu for="ingresosanciones">
+                            <p:menuitem value="Eliminar" update="ingresosanciones" icon="ui-icon-close" actionListener="#{ingresosancionBean.eliminarIngresoSancion}" ajax="false"/>
+                        </p:contextMenu>
+                    </h:form>
+
+                    <h:form id="dialogoForm" prependId="false">
+                        <p:dialog header="Agregar Ingreso Sancion" widgetVar="ingresosancionDialogo" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                            <p:outputPanel id="ingresosancionDetalle" style="text-align:center;">
+                                <p:panelGrid  columns="2" columnClasses="label,value">
+
+                                    <h:outputText value="Equipo"/>
+                                    <h:selectOneMenu value="#{ingresosancionBean.ingresoSancionSeleccionada.equipo}" >
+                                        <f:selectItems value="#{equipoBean.equipos}" var="equipo"
+                                                       itemLabel="#{equipo.nombreEquipo}" itemValue="#{equipo.nombreEquipo}"/>
+                                    </h:selectOneMenu>
+
+                                    <h:outputText value="Numero Jugador" />
+                                    <h:inputText value="#{ingresosancionBean.ingresoSancionSeleccionada.numeroJugador}" />
+
+                                    <h:outputText value="Sancion" />
+                                    <h:selectOneMenu value="#{ingresosancionBean.ingresoSancionSeleccionada.sancion}" >
+                                        <f:selectItems value="#{sancionBean.sanciones}" var="sancion"
+                                                       itemLabel="#{sancion.tipoSancion}" itemValue="#{sancion.suspencion}"/>
+                                    </h:selectOneMenu>
+
+
+                                    <f:facet name="footer">
+                                        <h:commandButton value="Agregar" actionListener="#{ingresosancionBean.agregarIngresoSancion}" />
+                                    </f:facet>
+
+                                </p:panelGrid>
+                            </p:outputPanel>
+                        </p:dialog>
+                    </h:form>
+                </h:body>
+
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
